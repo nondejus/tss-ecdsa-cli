@@ -73,7 +73,11 @@ pub fn aes_decrypt(key: &[u8], aead_pack: AEAD) -> Vec<u8> {
     out
 }
 
-pub fn postb<T>(addr: &String, client: &Client, path: &str, body: T) -> Option<String>
+pub fn postb<T>(
+    addr: &String,
+    //client: &Client,
+    path: &str,
+    body: T) -> Option<String>
 where
     T: serde::ser::Serialize,
 {
@@ -90,11 +94,21 @@ where
     let retry_delay = time::Duration::from_millis(250);
     for _i in 1..retries {
         let addr = format!("{}/{}", addr, path);
-        let res = client.post(&addr).json(&body).send();
-
-        if let Ok(res) = res {
-            return Some(res.text().unwrap());
+        match path {
+            "get" => {
+                return None
+            },
+            "set" => { return None},
+            "signupkeygen" => {return None},
+            "signupkeygen" => {return None},
+            _ => {info!("unknown action"); },
+        
         }
+        //let res = client.post(&addr).json(&body).send();
+
+        /*if let Ok(res) = res {
+            return Some(res.text().unwrap());
+        }*/
         thread::sleep(retry_delay);
     }
     None

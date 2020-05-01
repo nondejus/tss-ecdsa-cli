@@ -19,7 +19,7 @@ use reqwest::blocking::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-use crate::common::{broadcast, poll_for_broadcasts, poll_for_p2p, sendp2p, Params, PartySignup};
+use crate::common::{broadcast, poll_for_broadcasts, poll_for_p2p, postb, sendp2p, Params, PartySignup};
 
 #[derive(Hash, PartialEq, Eq, Clone, Debug, Serialize, Deserialize)]
 pub struct TupleKey {
@@ -42,12 +42,15 @@ pub fn sign(
     f_l_new: &FE,
     sign_at_path: bool,
 ) {
-    let client = Client::new();
+    //let client = Client::new();
     let delay = time::Duration::from_millis(25);
     let THRESHOLD = params.threshold.parse::<u16>().unwrap();
 
     // Signup
-    let (party_num_int, uuid) = match signup(&addr, &client, &params).unwrap() {
+    let (party_num_int, uuid) = match signup(
+        &addr,
+        //&client,
+        &params).unwrap() {
         PartySignup { number, uuid } => (number, uuid),
     };
 
@@ -57,7 +60,7 @@ pub fn sign(
     // round 0: collect signers IDs
     assert!(broadcast(
         &addr,
-        &client,
+        //&client,
         party_num_int,
         "round0",
         serde_json::to_string(&party_id).unwrap(),
@@ -67,7 +70,7 @@ pub fn sign(
 
     let round0_ans_vec = poll_for_broadcasts(
         &addr,
-        &client,
+        //&client,
         party_num_int,
         THRESHOLD + 1,
         delay,
@@ -141,7 +144,7 @@ pub fn sign(
     let m_a_k = MessageA::a(&sign_keys.k_i, &party_keys.ek);
     assert!(broadcast(
         &addr,
-        &client,
+        //&client,
         party_num_int,
         "round1",
         serde_json::to_string(&(com.clone(), m_a_k.clone())).unwrap(),
@@ -150,7 +153,7 @@ pub fn sign(
     .is_ok());
     let round1_ans_vec = poll_for_broadcasts(
         &addr,
-        &client,
+        //&client,
         party_num_int,
         THRESHOLD + 1,
         delay,
@@ -210,7 +213,7 @@ pub fn sign(
         if i != party_num_int {
             assert!(sendp2p(
                 &addr,
-                &client,
+                //&client,
                 party_num_int.clone(),
                 i.clone(),
                 "round2",
@@ -225,7 +228,7 @@ pub fn sign(
 
     let round2_ans_vec = poll_for_p2p(
         &addr,
-        &client,
+        //&client,
         party_num_int,
         THRESHOLD + 1,
         delay,
@@ -283,7 +286,7 @@ pub fn sign(
 
     assert!(broadcast(
         &addr,
-        &client,
+        //&client,
         party_num_int,
         "round3",
         serde_json::to_string(&delta_i).unwrap(),
@@ -292,7 +295,7 @@ pub fn sign(
     .is_ok());
     let round3_ans_vec = poll_for_broadcasts(
         &addr,
-        &client,
+        //&client,
         party_num_int,
         THRESHOLD + 1,
         delay,
@@ -312,7 +315,7 @@ pub fn sign(
     // decommit to gamma_i
     assert!(broadcast(
         &addr,
-        &client,
+        //&client,
         party_num_int,
         "round4",
         serde_json::to_string(&decommit).unwrap(),
@@ -321,7 +324,7 @@ pub fn sign(
     .is_ok());
     let round4_ans_vec = poll_for_broadcasts(
         &addr,
-        &client,
+        //&client,
         party_num_int,
         THRESHOLD + 1,
         delay,
@@ -361,7 +364,7 @@ pub fn sign(
     //phase (5A)  broadcast commit
     assert!(broadcast(
         &addr,
-        &client,
+        //&client,
         party_num_int.clone(),
         "round5",
         serde_json::to_string(&phase5_com).unwrap(),
@@ -370,7 +373,7 @@ pub fn sign(
     .is_ok());
     let round5_ans_vec = poll_for_broadcasts(
         &addr,
-        &client,
+        //&client,
         party_num_int.clone(),
         THRESHOLD + 1,
         delay.clone(),
@@ -389,7 +392,7 @@ pub fn sign(
     //phase (5B)  broadcast decommit and (5B) ZK proof
     assert!(broadcast(
         &addr,
-        &client,
+        //&client,
         party_num_int.clone(),
         "round6",
         serde_json::to_string(&(phase_5a_decom.clone(), helgamal_proof.clone())).unwrap(),
@@ -398,7 +401,7 @@ pub fn sign(
     .is_ok());
     let round6_ans_vec = poll_for_broadcasts(
         &addr,
-        &client,
+        //&client,
         party_num_int.clone(),
         THRESHOLD + 1,
         delay.clone(),
@@ -435,7 +438,7 @@ pub fn sign(
     //////////////////////////////////////////////////////////////////////////////
     assert!(broadcast(
         &addr,
-        &client,
+        //&client,
         party_num_int.clone(),
         "round7",
         serde_json::to_string(&phase5_com2).unwrap(),
@@ -444,7 +447,7 @@ pub fn sign(
     .is_ok());
     let round7_ans_vec = poll_for_broadcasts(
         &addr,
-        &client,
+        //&client,
         party_num_int.clone(),
         THRESHOLD + 1,
         delay.clone(),
@@ -463,7 +466,7 @@ pub fn sign(
     //phase (5B)  broadcast decommit and (5B) ZK proof
     assert!(broadcast(
         &addr,
-        &client,
+        //&client,
         party_num_int.clone(),
         "round8",
         serde_json::to_string(&phase_5d_decom2).unwrap(),
@@ -472,7 +475,7 @@ pub fn sign(
     .is_ok());
     let round8_ans_vec = poll_for_broadcasts(
         &addr,
-        &client,
+        //&client,
         party_num_int.clone(),
         THRESHOLD + 1,
         delay.clone(),
@@ -502,7 +505,7 @@ pub fn sign(
     //////////////////////////////////////////////////////////////////////////////
     assert!(broadcast(
         &addr,
-        &client,
+        //&client,
         party_num_int.clone(),
         "round9",
         serde_json::to_string(&s_i).unwrap(),
@@ -511,7 +514,7 @@ pub fn sign(
     .is_ok());
     let round9_ans_vec = poll_for_broadcasts(
         &addr,
-        &client,
+        //&client,
         party_num_int.clone(),
         THRESHOLD + 1,
         delay.clone(),
@@ -586,20 +589,27 @@ fn format_vec_from_reads<'a, T: serde::Deserialize<'a> + Clone>(
         }
     }
 }
-
-pub fn postb<T>(addr: &String, client: &Client, path: &str, body: T) -> Option<String>
+/*
+pub fn postb<T>(
+    addr: &String,
+    //client: &Client,
+    path: &str, body: T) -> Option<String>
 where
     T: serde::ser::Serialize,
 {
-    let res = client
-        .post(&format!("{}/{}", addr, path))
+    let res = post(&format!("{}/{}", addr, path))
         .json(&body)
         .send();
     Some(res.unwrap().text().unwrap())
 }
-
-pub fn signup(addr: &String, client: &Client, params: &Params) -> Result<PartySignup, ()> {
-    let res_body = postb(&addr, &client, "signupsign", params).unwrap();
+*/
+pub fn signup(
+     addr: &String,
+     //client: &Client,
+     params: &Params) -> Result<PartySignup, ()> {
+    let res_body = postb(&addr,
+        // &client,
+         "signupsign", params).unwrap();
     let answer: Result<PartySignup, ()> = serde_json::from_str(&res_body).unwrap();
     return answer;
 }
