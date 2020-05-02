@@ -37,7 +37,9 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>) {
         threshold: THRESHOLD.to_string(),
         parties: PARTIES.to_string(),
     };
-    let (party_num_int, uuid) = match keygen_signup(&addr, &client, &tn_params).unwrap() {
+    let (party_num_int, uuid) = match keygen_signup(&addr,
+        // &client,
+         &tn_params).unwrap() {
         PartySignup { number, uuid } => (number, uuid),
     };
     println!("number: {:?}, uuid: {:?}", party_num_int, uuid);

@@ -1,5 +1,5 @@
 #![allow(non_snake_case)]
-#![feature(proc_macro_hygiene, decl_macro)]
+//#![feature(proc_macro_hygiene, decl_macro)]
 
 extern crate clap;
 extern crate curv;
@@ -11,7 +11,7 @@ extern crate serde_json;
 
 use std::fs;
 
-use clap::{App, AppSettings, Arg, SubCommand};
+//use clap::{App, AppSettings, Arg, SubCommand};
 use curv::cryptographic_primitives::secret_sharing::feldman_vss::VerifiableSS;
 use curv::elliptic::curves::traits::*;
 use curv::{BigInt, GE};
@@ -23,7 +23,6 @@ use common::{hd_keys, keygen, manager, signer, Params};
 use log::{info};
 mod common;
 
-static keysfiles: [&str; 3]   = { "keysfile_1", "keysfile_2", "keysfile_3"};
 
 fn main() {
     println!("Doing Nothing right now");
@@ -94,8 +93,9 @@ fn main() {
     */
 //    match matches.subcommand() {
         //("pubkey", Some(sub_matches)) | ("sign", Some(sub_matches)) => {
-pub fn pubkey_or_sign(party: i32, pub_or_sign: bool) {
-    let keysfile_path = keysfiles[party];
+pub fn pubkey_or_sign(party: char, pub_or_sign: bool) {
+    let keysfile_path = String::from("keysfile_");
+    keysfile_path.push(party);
 
     // Read data from keys file
     let data = fs::read_to_string(keysfile_path).expect(
@@ -148,15 +148,16 @@ pub fn pubkey_or_sign(party: i32, pub_or_sign: bool) {
             .to_string();
         */
         // Parse threshold params
-        let params: Vec<&str> = sub_matches
+        /*let params: Vec<&str> = sub_matches
             .value_of("params")
             .unwrap_or("")
             .split("/")
             .collect();
+        */
         //            println!("sign me {:?} / {:?} / {:?}", manager_addr, message, params);
         let params = Params {
-            threshold: String::new("2"),
-            parties: String::new("3"),
+            threshold: String::from("2"),
+            parties: String::from("3"),
         };
         signer::sign(
             manager_addr,
@@ -169,8 +170,8 @@ pub fn pubkey_or_sign(party: i32, pub_or_sign: bool) {
             &params,
             &message,
             &f_l_new,
-            false
-            //!path.is_empty(),
+            false,
+            // !path.is_empty(), 
         )
     }
 }
@@ -179,20 +180,23 @@ pub fn manager() {
 //("manager", Some(_matches)) => manager::run_manager(),
     manager::run_manager();
 }
-pub fn keygen(party: i32) {
+pub fn keygen(party: char) {
 //("keygen", Some(sub_matches)) => {
-    let addr = String::new("dummy");
+    let addr = String::from("dummy");
     /*    let addr = sub_matches
         .value_of("manager_addr")
         .unwrap_or("http://127.0.0.1:8001")
         .to_string();
     */
-    let keysfile_path = keysfiles[party];
+
+    let keysfile_path = String::from("keysfile_");
+    keysfile_path.push(party);
     //let keysfile_path = sub_matches.value_of("keysfile").unwrap_or("").to_string();
-    let params = Params {
-        threshold: String::new("2"),
-        parties: String::new("3"),
-    };
+    /*let params = Params {
+        threshold: String::from("2"),
+        parties: String::from("3"),
+    };*/
+    let params = vec!["2", "3"];
     /*
     let params: Vec<&str> = sub_matches
         .value_of("params")

@@ -1,15 +1,15 @@
 use std::collections::HashMap;
 use std::sync::{RwLock, Mutex, Arc};
 
-use rocket::{post, routes, State};
-use rocket_contrib::json::Json;
+//use rocket::{post, routes, State};
+//use rocket_contrib::json::Json;
 use uuid::Uuid;
 
 use crate::common::{Entry, Index, Key, Params, PartySignup};
 use serde_json;
 
 pub fn get_shared_state() -> Arc<Mutex<HashMap<Key, String>>> {
-    static shared_hm = Arc::new(Mutex::new(HashMap::new()));
+    static shared_hm: Arc<Mutex<HashMap<Key, String>>> = Arc::new(Mutex::new(HashMap::new()));
     Arc::clone(&shared_hm)
 }
 //static db_cell: HashMap<Key, String> = HashMap::new());
@@ -62,7 +62,9 @@ pub fn get(
 //) -> Json<Result<Entry, ()>> {
 ) -> Result<Entry, ()> {
     //let index: Index = request.0;
-    let mut hm = db_cell.borrow_mut();
+    
+    let hm = get_shared_state().lock().unwrap();
+    //let mut hm = db_cell.borrow_mut();
     match hm.get(&request.key) {
         Some(v) => {
             let entry = Entry {
@@ -78,7 +80,9 @@ pub fn get(
 //#[post("/set", format = "json", data = "<request>")]
 //fn set(db_mtx: State<RwLock<HashMap<Key, String>>>, request: Json<Entry>) -> Json<Result<(), ()>> {
 pub fn set(request: Entry) -> Result<(), ()> {
-    let mut hm = db_cell.borrow_mut();
+
+    let hm = get_shared_state().lock().unwrap();
+    //let mut hm = db_cell.borrow_mut();
     hm.insert(request.key.clone(), request.value.clone());
     Ok(())
 }
@@ -93,7 +97,9 @@ pub fn signup_keygen(
     let key = "signup-keygen".to_string();
 
     let party_signup = {
-        let mut hm = db_cell.borrow_mut();
+
+        let hm = get_shared_state().lock().unwrap();
+        //let mut hm = db_cell.borrow_mut();
         let value = hm.get(&key).unwrap();
         let client_signup: PartySignup = serde_json::from_str(&value).unwrap();
         if client_signup.number < parties {
@@ -109,7 +115,8 @@ pub fn signup_keygen(
         }
     };
 
-    let mut hm = db_cell.borrow_mut();
+    let hm = get_shared_state().lock().unwrap();
+    //let mut hm = db_cell.borrow_mut();
     hm.insert(key, serde_json::to_string(&party_signup).unwrap());
     Ok(party_signup)
 }
@@ -125,7 +132,9 @@ pub fn signup_sign(
     let key = "signup-sign".to_string();
 
     let party_signup = {
-        let mut hm = db_cell.borrow_mut();
+
+        let hm = get_shared_state().lock().unwrap();
+        //let mut hm = db_cell.borrow_mut();
         let value = hm.get(&key).unwrap();
         let client_signup: PartySignup = serde_json::from_str(&value).unwrap();
         if client_signup.number < threshold + 1 {
@@ -141,7 +150,8 @@ pub fn signup_sign(
         }
     };
 
-    let mut hm = db_cell.borrow_mut();
+    let hm = get_shared_state().lock().unwrap();
+    //let mut hm = db_cell.borrow_mut();
     hm.insert(key, serde_json::to_string(&party_signup).unwrap());
     Ok(party_signup)
 }
