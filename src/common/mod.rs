@@ -48,7 +48,7 @@ pub struct Entry {
     pub value: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
     pub parties: String,
     pub threshold: String,
@@ -77,7 +77,7 @@ pub fn aes_decrypt(key: &[u8], aead_pack: AEAD) -> Vec<u8> {
     gcm.decrypt(&aead_pack.ciphertext[..], &mut out, &aead_pack.tag[..]);
     out
 }
-
+/*
 pub fn postb<T>(
     addr: &String,
     //client: &Client,
@@ -117,7 +117,7 @@ pub fn postb<T>(
     }
     None
 }
-
+*/
 pub fn broadcast(
     addr: &String,
     //client: &Client,
@@ -186,7 +186,7 @@ pub fn poll_for_broadcasts(
                     // &client,
                      "get", index.clone(), shm).unwrap();
                 */
-                let res_body = manager::get(index, shm);
+                let res_body = manager::get(index.clone(), shm);
                 //let answer: Result<Entry, ()> = serde_json::from_str(&res_body).unwrap();
                 if let Ok(answer) = res_body {
                     ans_vec.push(answer.value);
@@ -221,7 +221,7 @@ pub fn poll_for_p2p(
                     // &client,
                      "get", index.clone(), shm).unwrap();
                 let answer: Result<Entry, ()> = serde_json::from_str(&res_body).unwrap();*/
-                let res_body = manager::get(index, shm);
+                let res_body = manager::get(index.clone(), shm);
                 if let Ok(answer) = res_body {
                     ans_vec.push(answer.value);
                     println!("[{:?}] party {:?} => party {:?}", round, i, party_num);

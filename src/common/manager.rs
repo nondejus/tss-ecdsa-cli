@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::sync::{RwLock, Mutex, Arc};
-
+use std::time;
 //use rocket::{post, routes, State};
 //use rocket_contrib::json::Json;
 use uuid::Uuid;
@@ -61,19 +61,23 @@ pub fn get(
 //) -> Json<Result<Entry, ()>> {
 ) -> Result<Entry, ()> {
     //let index: Index = request.0;
-    
-    let hm = shm.lock().unwrap();
+    let retries = 3;
+    let retry_delay = time::Duration::from_millis(250); 
+    for _ in 0..retries {
+        let hm = shm.lock().unwrap();
     //let mut hm = db_cell.borrow_mut();
-    match hm.get(&request.key) {
-        Some(v) => {
-            let entry = Entry {
-                key: request.key,
-                value: v.clone().to_string(),
-            };
-            Ok(entry)
+        match hm.get(&request.key) {
+            Some(v) => {
+                let entry = Entry {
+                    key: request.key,
+                    value: v.clone().to_string(),
+                };
+                return Ok(entry)
+            }
+            None => {continue;},
         }
-        None => Err(()),
     }
+    Err(())
 }
 
 //#[post("/set", format = "json", data = "<request>")]

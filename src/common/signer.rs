@@ -23,7 +23,7 @@ use reqwest::blocking::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-use crate::common::{broadcast, poll_for_broadcasts, poll_for_p2p, postb, sendp2p, Params, PartySignup};
+use crate::common::{broadcast, poll_for_broadcasts, poll_for_p2p, sendp2p, Params, PartySignup};
 
 #[derive(Hash, PartialEq, Eq, Clone, Debug, Serialize, Deserialize)]
 pub struct TupleKey {
@@ -634,7 +634,7 @@ pub fn signup(
      params: &Params,
      shm: &gs) -> Result<PartySignup, ()> {
     use crate::manager::signup_sign;
-    signup_sign(*params.clone(), shm)
+    signup_sign((*params).clone(), shm)
     /*let res_body = postb(&addr,
         // &client,
          "signupsign", params, shm).unwrap();

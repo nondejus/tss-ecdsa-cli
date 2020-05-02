@@ -25,7 +25,7 @@ use paillier::EncryptionKey;
 use reqwest::blocking::Client;
 
 use crate::common::{
-    aes_decrypt, aes_encrypt, broadcast, poll_for_broadcasts, poll_for_p2p, postb, sendp2p, Params,
+    aes_decrypt, aes_encrypt, broadcast, poll_for_broadcasts, poll_for_p2p, sendp2p, Params,
     PartySignup, AEAD,
 };
 
@@ -289,7 +289,7 @@ pub fn keygen_signup(
     params: &Params,
     shm: &gs) -> Result<PartySignup, ()> {
     use crate::manager::signup_keygen;
-    signup_keygen(*params.clone(), shm)
+    signup_keygen((*params).clone(), shm)
     /*let res_body = postb(
         &addr,
         //&client,
