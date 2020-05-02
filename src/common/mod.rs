@@ -6,7 +6,7 @@ pub mod signer;
 use std::sync::{Arc, Mutex};
 
 use std::collections::HashMap;
-type gs = Arc<Mutex<HashMap<Key, String>>>;
+type gs = Arc<Mutex<HashMap<Key, String, crate::random_state::PsRandomState>>>;
 
 use std::{iter::repeat, thread, time, time::Duration};
 use log::info;

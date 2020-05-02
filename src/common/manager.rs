@@ -5,7 +5,7 @@ use std::time;
 //use rocket_contrib::json::Json;
 use uuid::Uuid;
 
-type gs = Arc<Mutex<HashMap<Key, String>>>;
+type gs = Arc<Mutex<HashMap<Key, String, crate::random_state::PsRandomState>>>;
 
 use crate::common::{Entry, Index, Key, Params, PartySignup};
 use serde_json;

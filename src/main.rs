@@ -31,7 +31,6 @@ use std::char;
 use env_logger;
 
 
-use std::collections::HashMap;
 use tss_cli::run_keygen;
 
 fn main() {
@@ -39,5 +38,5 @@ fn main() {
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
     env_logger::init();
 
-    run_keygen(HashMap::new());
+    run_keygen();
 }

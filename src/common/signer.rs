@@ -9,7 +9,7 @@ use std::time;
 use std::sync::{Arc, Mutex};
 use crate::common::{Entry, Index, Key};
 use std::collections::HashMap;
-type gs = Arc<Mutex<HashMap<Key, String>>>;
+type gs = Arc<Mutex<HashMap<Key, String, crate::random_state::PsRandomState>>>;
 
 use curv::cryptographic_primitives::proofs::sigma_correct_homomorphic_elgamal_enc::HomoELGamalProof;
 use curv::cryptographic_primitives::proofs::sigma_dlog::DLogProof;
