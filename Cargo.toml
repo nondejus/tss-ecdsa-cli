@@ -21,23 +21,24 @@ reqwest = { version = "0.10.1", default-features = false, features = ["native-tl
 uuid = { version = "0.8", features = ["v4"] }
 rust-crypto = "0.2"
 libsecp256k1 = "0.3.2"
-paillier = { git = "https://github.com/KZen-networks/rust-paillier", tag = "v0.3.4"}
-zk-paillier = { git = "https://github.com/KZen-networks/zk-paillier", tag = "v0.2.5"}
+paillier = { git = "https://github.com/PolySignInc/rust-paillier", branch = "v0.3.4t"}
+zk-paillier = { git = "https://github.com/PolySignInc/zk-paillier", branch = "v0.2.5t"}
 clap = { version = "2.33", features = ["yaml"] }
 log = {version = "0.4.6", features = ["std"]}
 
 [dependencies.multi-party-ecdsa]
-git = "https://github.com/KZen-networks/multi-party-ecdsa"
-tag = "v0.3.0"
+git = "https://github.com/PolySignInc/multi-party-ecdsa"
+branch = "v0.3.0t"
 #branch = "master"
 
 [dependencies.curv]
-git = "https://github.com/KZen-networks/curv"
-tag = "v0.2.3"
+git = "https://github.com/PolySignInc/curv"
+#tag = "v0.2.3t"
+branch = "v0.2.3t"
 features = ["ec_secp256k1"]
 
 [patch.crates-io]
-rust-gmp = { version = "0.5.0", features = ["serde_support"], git = "https://github.com/KZen-networks/rust-gmp" }
+rust-gmp = { version = "0.5.0", features = ["serde_support"], git = "https://github.com/PolySignInc/rust-gmp" }
 
 [profile.release]
 opt-level = 2
