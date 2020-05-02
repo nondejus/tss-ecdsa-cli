@@ -4,7 +4,7 @@ pub mod manager;
 pub mod signer;
 
 use std::sync::{Arc, Mutex};
-use crate::common::{Entry, Index, Key};
+
 use std::collections::HashMap;
 type gs = Arc<Mutex<HashMap<Key, String>>>;
 
@@ -82,7 +82,8 @@ pub fn postb<T>(
     addr: &String,
     //client: &Client,
     path: &str,
-    body: T) -> Option<String>
+    body: T,
+    shm: &gs) -> Option<String>
 where
     T: serde::ser::Serialize,
 {
@@ -126,6 +127,7 @@ pub fn broadcast(
     round: &str,
     data: String,
     sender_uuid: String,
+    shm: &gs
 ) -> Result<(), ()> {
     let key = format!("{}-{}-{}", party_num, round, sender_uuid);
     let entry = Entry {
@@ -135,7 +137,7 @@ pub fn broadcast(
 
     let res_body = postb(&addr,
         // &client,
-         "set", entry).unwrap();
+         "set", entry, shm).unwrap();
     serde_json::from_str(&res_body).unwrap()
 }
 
@@ -147,6 +149,7 @@ pub fn sendp2p(
     round: &str,
     data: String,
     sender_uuid: String,
+    shm: &gs
 ) -> Result<(), ()> {
     let key = format!("{}-{}-{}-{}", party_from, party_to, round, sender_uuid);
 
@@ -157,7 +160,7 @@ pub fn sendp2p(
 
     let res_body = postb(&addr, 
         //&client,
-         "set", entry).unwrap();
+         "set", entry, shm).unwrap();
     serde_json::from_str(&res_body).unwrap()
 }
 
@@ -169,6 +172,7 @@ pub fn poll_for_broadcasts(
     delay: Duration,
     round: &str,
     sender_uuid: String,
+    shm: &gs
 ) -> Vec<String> {
     let mut ans_vec = Vec::new();
     for i in 1..=n {
@@ -180,7 +184,7 @@ pub fn poll_for_broadcasts(
                 thread::sleep(delay);
                 let res_body = postb(&addr,
                     // &client,
-                     "get", index.clone()).unwrap();
+                     "get", index.clone(), shm).unwrap();
                 let answer: Result<Entry, ()> = serde_json::from_str(&res_body).unwrap();
                 if let Ok(answer) = answer {
                     ans_vec.push(answer.value);
@@ -201,6 +205,7 @@ pub fn poll_for_p2p(
     delay: Duration,
     round: &str,
     sender_uuid: String,
+    shm: &gs
 ) -> Vec<String> {
     let mut ans_vec = Vec::new();
     for i in 1..=n {
@@ -212,7 +217,7 @@ pub fn poll_for_p2p(
                 thread::sleep(delay);
                 let res_body = postb(&addr,
                     // &client,
-                     "get", index.clone()).unwrap();
+                     "get", index.clone(), shm).unwrap();
                 let answer: Result<Entry, ()> = serde_json::from_str(&res_body).unwrap();
                 if let Ok(answer) = answer {
                     ans_vec.push(answer.value);

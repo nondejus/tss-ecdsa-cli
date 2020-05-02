@@ -29,10 +29,10 @@ use crate::common::{
     PartySignup, AEAD,
 };
 
-pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>) {
+pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm: &gs) {
     let THRESHOLD: u16 = params[0].parse::<u16>().unwrap();
     let PARTIES: u16 = params[1].parse::<u16>().unwrap();
-
+    
     //let client = Client::new();
 
     // delay:
@@ -49,7 +49,7 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>) {
     };
     let (party_num_int, uuid) = match keygen_signup(&addr,
         // &client,
-         &tn_params).unwrap() {
+         &tn_params, shm).unwrap() {
         PartySignup { number, uuid } => (number, uuid),
     };
     println!("number: {:?}, uuid: {:?}", party_num_int, uuid);
@@ -65,6 +65,7 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>) {
         "round1",
         serde_json::to_string(&bc_i).unwrap(),
         uuid.clone(),
+        shm
     )
     .is_ok());
     let round1_ans_vec = poll_for_broadcasts(
@@ -75,6 +76,7 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>) {
         delay,
         "round1",
         uuid.clone(),
+        shm
     );
 
     let mut bc1_vec = round1_ans_vec
@@ -92,6 +94,7 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>) {
         "round2",
         serde_json::to_string(&decom_i).unwrap(),
         uuid.clone(),
+        shm
     )
     .is_ok());
     let round2_ans_vec = poll_for_broadcasts(
@@ -102,6 +105,7 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>) {
         delay,
         "round2",
         uuid.clone(),
+        shm,
     );
 
     let mut j = 0;
@@ -147,6 +151,7 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>) {
                 "round3",
                 serde_json::to_string(&aead_pack_i).unwrap(),
                 uuid.clone(),
+                shm,
             )
             .is_ok());
             j += 1;
@@ -161,6 +166,7 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>) {
         delay,
         "round3",
         uuid.clone(),
+        shm,
     );
 
     let mut j = 0;
@@ -188,6 +194,7 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>) {
         "round4",
         serde_json::to_string(&vss_scheme).unwrap(),
         uuid.clone(),
+        shm,
     )
     .is_ok());
     let round4_ans_vec = poll_for_broadcasts(
@@ -198,6 +205,7 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>) {
         delay,
         "round4",
         uuid.clone(),
+        shm,
     );
 
     let mut j = 0;
@@ -230,6 +238,7 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>) {
         "round5",
         serde_json::to_string(&dlog_proof).unwrap(),
         uuid.clone(),
+        shm,
     )
     .is_ok());
     let round5_ans_vec = poll_for_broadcasts(
@@ -240,6 +249,7 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>) {
         delay,
         "round5",
         uuid.clone(),
+        shm,
     );
 
     let mut j = 0;
@@ -276,11 +286,12 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>) {
 pub fn keygen_signup(
     addr: &String,
     //client: &Client,
-    params: &Params) -> Result<PartySignup, ()> {
+    params: &Params,
+    shm: &gs) -> Result<PartySignup, ()> {
     let res_body = postb(
         &addr,
         //&client,
         "signupkeygen",
-        params).unwrap();
+        params, shm).unwrap();
     serde_json::from_str(&res_body).unwrap()
 }

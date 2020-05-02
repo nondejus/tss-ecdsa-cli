@@ -97,7 +97,7 @@ fn main() {
     */
 //    match matches.subcommand() {
         //("pubkey", Some(sub_matches)) | ("sign", Some(sub_matches)) => {
-pub fn pubkey_or_sign(party: char, pub_or_sign: bool, shm: gs) {
+pub fn pubkey_or_sign(party: char, pub_or_sign: bool, shm: &gs) {
     let mut keysfile_path = String::from("keysfile_");
     keysfile_path.push(party);
 
@@ -140,7 +140,7 @@ pub fn pubkey_or_sign(party: char, pub_or_sign: bool, shm: gs) {
     } else {
         // Parse message to sign
         let message_str = "PolySign";
-        let message = match hex::decode(message_str.clone()) {
+        let message = match hex::decode(message_str) {
             Ok(x) => x,
             Err(_e) => message_str.as_bytes().to_vec(),
         };
@@ -181,11 +181,11 @@ pub fn pubkey_or_sign(party: char, pub_or_sign: bool, shm: gs) {
     }
 }
 
-pub fn manager() {
+pub fn manager(shm: &gs) {
 //("manager", Some(_matches)) => manager::run_manager(),
-    manager::run_manager();
+    manager::run_manager(shm);
 }
-pub fn keygen(party: char) {
+pub fn keygen(party: char, shm: &gs) {
 //("keygen", Some(sub_matches)) => {
     let addr = String::from("dummy");
     /*    let addr = sub_matches
@@ -212,7 +212,8 @@ pub fn keygen(party: char) {
     keygen::run_keygen(
         &addr,
         &keysfile_path,
-        &params
+        &params,
+        shm
     );
 }
 

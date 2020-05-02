@@ -10,12 +10,8 @@ type gs = Arc<Mutex<HashMap<Key, String>>>;
 use crate::common::{Entry, Index, Key, Params, PartySignup};
 use serde_json;
 
-pub fn get_shared_state() -> Arc<Mutex<HashMap<Key, String>>> {
-    static shared_hm: Arc<Mutex<HashMap<Key, String>>> = Arc::new(Mutex::new(HashMap::new()));
-    Arc::clone(&shared_hm)
-}
 //static db_cell: HashMap<Key, String> = HashMap::new());
-pub fn run_manager() {
+pub fn run_manager(shm: &gs) {
     //     let mut my_config = Config::development();
     //     my_config.set_port(18001);
     //let db: HashMap<Key, String> = HashMap::new();
@@ -43,7 +39,7 @@ pub fn run_manager() {
     };
     {
         //let mut hm = db_mtx.write().unwrap();
-        let db = get_shared_state().lock().unwrap();
+        let mut db = shm.lock().unwrap();
         db.insert(
             keygen_key,
             serde_json::to_string(&party_signup_keygen).unwrap(),
@@ -61,12 +57,12 @@ pub fn run_manager() {
 pub fn get(
     //db_mtx: State<RwLock<HashMap<Key, String>>>,
     request: Index,
-    shm: gs
+    shm: &gs
 //) -> Json<Result<Entry, ()>> {
 ) -> Result<Entry, ()> {
     //let index: Index = request.0;
     
-    let hm = get_shared_state().lock().unwrap();
+    let hm = shm.lock().unwrap();
     //let mut hm = db_cell.borrow_mut();
     match hm.get(&request.key) {
         Some(v) => {
@@ -82,9 +78,9 @@ pub fn get(
 
 //#[post("/set", format = "json", data = "<request>")]
 //fn set(db_mtx: State<RwLock<HashMap<Key, String>>>, request: Json<Entry>) -> Json<Result<(), ()>> {
-pub fn set(request: Entry, shm: gs) -> Result<(), ()> {
+pub fn set(request: Entry, shm: &gs) -> Result<(), ()> {
 
-    let hm = get_shared_state().lock().unwrap();
+    let mut hm = shm.lock().unwrap();
     //let mut hm = db_cell.borrow_mut();
     hm.insert(request.key.clone(), request.value.clone());
     Ok(())
@@ -94,7 +90,7 @@ pub fn set(request: Entry, shm: gs) -> Result<(), ()> {
 pub fn signup_keygen(
 //    db_mtx: State<RwLock<HashMap<Key, String>>>,
     request: Params,
-    shm: gs
+    shm: &gs
 //) -> Json<Result<PartySignup, ()>> {
 ) -> Result<PartySignup, ()> {
     let parties = request.parties.parse::<u16>().unwrap();
@@ -102,7 +98,7 @@ pub fn signup_keygen(
 
     let party_signup = {
 
-        let hm = get_shared_state().lock().unwrap();
+        let hm = shm.lock().unwrap();
         //let mut hm = db_cell.borrow_mut();
         let value = hm.get(&key).unwrap();
         let client_signup: PartySignup = serde_json::from_str(&value).unwrap();
@@ -119,7 +115,7 @@ pub fn signup_keygen(
         }
     };
 
-    let hm = get_shared_state().lock().unwrap();
+    let mut hm = shm.lock().unwrap();
     //let mut hm = db_cell.borrow_mut();
     hm.insert(key, serde_json::to_string(&party_signup).unwrap());
     Ok(party_signup)
@@ -130,15 +126,15 @@ pub fn signup_sign(
 //    db_mtx: State<RwLock<HashMap<Key, String>>>,
 //    request: Json<Params>,
     request: Params,
-    shm: gs
+    shm: &gs
 //) -> Json<Result<PartySignup, ()>> {
 ) -> Result<PartySignup, ()> {
     let threshold = request.threshold.parse::<u16>().unwrap();
     let key = "signup-sign".to_string();
 
     let party_signup = {
-
-        let hm = get_shared_state().lock().unwrap();
+        
+        let hm = shm.lock().unwrap();
         //let mut hm = db_cell.borrow_mut();
         let value = hm.get(&key).unwrap();
         let client_signup: PartySignup = serde_json::from_str(&value).unwrap();
@@ -155,7 +151,7 @@ pub fn signup_sign(
         }
     };
 
-    let hm = get_shared_state().lock().unwrap();
+    let mut hm = shm.lock().unwrap();
     //let mut hm = db_cell.borrow_mut();
     hm.insert(key, serde_json::to_string(&party_signup).unwrap());
     Ok(party_signup)
