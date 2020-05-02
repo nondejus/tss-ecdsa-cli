@@ -10,6 +10,7 @@ type gs = Arc<Mutex<HashMap<Key, String>>>;
 use crate::common::{Entry, Index, Key, Params, PartySignup};
 use serde_json;
 
+use log::info;
 //static db_cell: HashMap<Key, String> = HashMap::new());
 pub fn run_manager(shm: &gs) {
     //     let mut my_config = Config::development();

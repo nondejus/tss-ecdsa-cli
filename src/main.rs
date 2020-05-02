@@ -27,7 +27,16 @@ use log::{info};
 mod common;
 use std::thread;
 use std::char;
+
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+use env_logger;
+
+
 fn main() {
+
+    #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+    env_logger::init();
+
     run_keygen();
 }
 pub fn run_keygen() {

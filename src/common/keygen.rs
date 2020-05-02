@@ -5,7 +5,7 @@ use std::sync::{Arc, Mutex};
 use crate::common::{Entry, Index, Key};
 use std::collections::HashMap;
 type gs = Arc<Mutex<HashMap<Key, String>>>;
-
+use log::info;
 
 
 
