@@ -45,3 +45,7 @@ rust-gmp = { version = "0.5.0", features = ["serde_support"], git = "https://git
 
 [profile.release]
 opt-level = 2
+
+[lib]
+name = "tss_cli"
+path = "src/lib.rs"
