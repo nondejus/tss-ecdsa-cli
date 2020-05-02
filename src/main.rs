@@ -42,6 +42,18 @@ fn main() {
     for handle in handles {
         handle.join().unwrap();
     }
+    handles = vec![];
+    for i in 1..4 {
+        let hm = Arc::clone(&shared_hm);
+        let handle = thread::spawn(move || {
+            pubkey_or_sign(char::from_digit(i, 10).unwrap(), false, &hm);
+        });
+        handles.push(handle);
+    }
+
+    for handle in handles {
+        handle.join().unwrap();
+    }
     println!("finished.");
     
 }
