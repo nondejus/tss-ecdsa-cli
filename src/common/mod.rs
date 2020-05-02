@@ -190,7 +190,7 @@ pub fn poll_for_broadcasts(
                 //let answer: Result<Entry, ()> = serde_json::from_str(&res_body).unwrap();
                 if let Ok(answer) = res_body {
                     ans_vec.push(answer.value);
-                    println!("[{:?}] party {:?} => party {:?}", round, i, party_num);
+                    info!("[{:?}] party {:?} => party {:?}", round, i, party_num);
                     break;
                 }
             }
@@ -224,7 +224,7 @@ pub fn poll_for_p2p(
                 let res_body = manager::get(index.clone(), shm);
                 if let Ok(answer) = res_body {
                     ans_vec.push(answer.value);
-                    println!("[{:?}] party {:?} => party {:?}", round, i, party_num);
+                    info!("[{:?}] party {:?} => party {:?}", round, i, party_num);
                     break;
                 }
             }

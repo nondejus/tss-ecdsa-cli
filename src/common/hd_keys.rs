@@ -9,7 +9,7 @@ use curv::{BigInt, FE, GE};
 pub fn get_hd_key(y_sum: &GE, path_vector: Vec<BigInt>) -> (GE, FE) {
     // generate a random but shared chain code, this will do
     let chain_code = GE::generator();
-    //    println!("chain code {:?}", chain_code);
+    //    info!("chain code {:?}", chain_code);
     // derive a new pubkey and LR sequence, y_sum becomes a new child pub key
     let (y_sum_child, f_l_new, _cc_new) = hd_key(
         path_vector,
@@ -17,9 +17,9 @@ pub fn get_hd_key(y_sum: &GE, path_vector: Vec<BigInt>) -> (GE, FE) {
         &chain_code.bytes_compressed_to_big_int(),
     );
     let y_sum = y_sum_child.clone();
-    //    println!("New public key: {:?}", &y_sum);
-    //    println!("Public key X: {:?}", &y_sum.x_coor());
-    //    println!("Public key Y: {:?}", &y_sum.y_coor());
+    //    info!("New public key: {:?}", &y_sum);
+    //    info!("Public key X: {:?}", &y_sum.x_coor());
+    //    info!("Public key Y: {:?}", &y_sum.y_coor());
     (y_sum, f_l_new)
 }
 

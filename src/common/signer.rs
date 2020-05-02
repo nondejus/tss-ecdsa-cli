@@ -60,7 +60,7 @@ pub fn sign(
     };
 
     let debug = json!({"manager_addr": &addr, "party_num": party_num_int, "uuid": uuid});
-    println!("{}", serde_json::to_string_pretty(&debug).unwrap());
+    info!("{}", serde_json::to_string_pretty(&debug).unwrap());
 
     // round 0: collect signers IDs
     assert!(broadcast(
@@ -101,7 +101,7 @@ pub fn sign(
         let g: GE = ECPoint::generator();
         // apply on first commitment for leader (leader is party with num=1)
         let com_zero_new = vss_scheme_vec[0].commitments[0] + g * f_l_new;
-        // println!("old zero: {:?}, new zero: {:?}", vss_scheme_vec[0].commitments[0], com_zero_new);
+        // info!("old zero: {:?}, new zero: {:?}", vss_scheme_vec[0].commitments[0], com_zero_new);
         // get iterator of all commitments and skip first zero commitment
         let mut com_iter_unchanged = vss_scheme_vec[0].commitments.iter();
         com_iter_unchanged.next().unwrap();
@@ -120,11 +120,11 @@ pub fn sign(
             commitments: com_vec_new,
         };
         // replace old vss_scheme for leader with new one at position 0
-        //    println!("comparing vectors: \n{:?} \nand \n{:?}", vss_scheme_vec[0], new_vss);
+        //    info!("comparing vectors: \n{:?} \nand \n{:?}", vss_scheme_vec[0], new_vss);
 
         vss_scheme_vec.remove(0);
         vss_scheme_vec.insert(0, new_vss);
-        //    println!("NEW VSS VECTOR: {:?}", vss_scheme_vec);
+        //    info!("NEW VSS VECTOR: {:?}", vss_scheme_vec);
     }
 
     let mut private = PartyPrivate::set_private(party_keys.clone(), shared_keys);
@@ -265,9 +265,9 @@ pub fn sign(
     let xi_com_vec = Keys::get_commitments_to_xi(&vss_scheme_vec);
     let mut j = 0;
     for i in 1..THRESHOLD + 2 {
-        //        println!("mbproof p={}, i={}, j={}", party_num_int, i, j);
+        //        info!("mbproof p={}, i={}, j={}", party_num_int, i, j);
         if i != party_num_int {
-            //            println!("verifying: p={}, i={}, j={}", party_num_int, i, j);
+            //            info!("verifying: p={}, i={}, j={}", party_num_int, i, j);
             let m_b = m_b_gamma_rec_vec[j].clone();
 
             let alpha_ij_gamma = m_b
@@ -285,9 +285,9 @@ pub fn sign(
                 signers_vec[(i - 1) as usize],
                 &signers_vec,
             );
-            //println!("Verifying client {}", party_num_int);
+            //info!("Verifying client {}", party_num_int);
             assert_eq!(m_b.b_proof.pk.clone(), g_w_i);
-            //println!("Verified client {}", party_num_int);
+            //info!("Verified client {}", party_num_int);
             j = j + 1;
         }
     }
@@ -367,7 +367,7 @@ pub fn sign(
 
     // we assume the message is already hashed (by the signer).
     let message_bn = BigInt::from(message);
-    //    println!("message_bn INT: {}", message_bn);
+    //    info!("message_bn INT: {}", message_bn);
     let message_int = BigInt::from(message);
     let two = BigInt::from(2);
     let message_bn = message_bn.modulus(&two.pow(256));
@@ -559,20 +559,20 @@ pub fn sign(
     let sig = local_sig
         .output_signature(&s_i_vec)
         .expect("verification failed");
-    //    println!(" \n");
-    //    println!("party {:?} Output Signature: \n", party_num_int);
-    //    println!("SIG msg: {:?}", sig.m);
-    //    println!("R: {:?}", sig.r);
-    //    println!("s: {:?} \n", sig.s);
-    //    println!("child pubkey: {:?} \n", y_sum);
+    //    info!(" \n");
+    //    info!("party {:?} Output Signature: \n", party_num_int);
+    //    info!("SIG msg: {:?}", sig.m);
+    //    info!("R: {:?}", sig.r);
+    //    info!("s: {:?} \n", sig.s);
+    //    info!("child pubkey: {:?} \n", y_sum);
 
-    //    println!("pubkey: {:?} \n", y_sum);
-    //    println!("verifying signature with public key");
+    //    info!("pubkey: {:?} \n", y_sum);
+    //    info!("verifying signature with public key");
     verify(&sig, &y_sum, &message_bn).expect("false");
-    //    println!("verifying signature with child pub key");
+    //    info!("verifying signature with child pub key");
     //    verify(&sig, &new_key, &message_bn).expect("false");
 
-    //    println!("{:?}", sig.recid.clone());
+    //    info!("{:?}", sig.recid.clone());
     //    print(sig.recid.clone()
 
     let ret_dict = json!({
@@ -584,17 +584,17 @@ pub fn sign(
         "y": &y_sum.y_coor(),
         "msg_int": message_int,
     });
-    println!("{}", ret_dict.to_string());
+    info!("{}", ret_dict.to_string());
 
     //    fs::write("signature".to_string(), sign_json).expect("Unable to save !");
 
-    //    println!("Public key Y: {:?}", to_bitcoin_public_key(y_sum.get_element()).to_bytes());
-    //    println!("Public child key X: {:?}", &new_key.x_coor());
-    //    println!("Public child key Y: {:?}", &new_key.y_coor());
-    //    println!("Public key big int: {:?}", &y_sum.bytes_compressed_to_big_int());
-    //    println!("Public key ge: {:?}", &y_sum.get_element().serialize());
-    //    println!("Public key ge: {:?}", PK::serialize_uncompressed(&y_sum.get_element()));
-    //    println!("New public key: {:?}", &y_sum.x_coor);
+    //    info!("Public key Y: {:?}", to_bitcoin_public_key(y_sum.get_element()).to_bytes());
+    //    info!("Public child key X: {:?}", &new_key.x_coor());
+    //    info!("Public child key Y: {:?}", &new_key.y_coor());
+    //    info!("Public key big int: {:?}", &y_sum.bytes_compressed_to_big_int());
+    //    info!("Public key ge: {:?}", &y_sum.get_element().serialize());
+    //    info!("Public key ge: {:?}", PK::serialize_uncompressed(&y_sum.get_element()));
+    //    info!("New public key: {:?}", &y_sum.x_coor);
 }
 
 fn format_vec_from_reads<'a, T: serde::Deserialize<'a> + Clone>(

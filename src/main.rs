@@ -56,7 +56,7 @@ pub fn run_keygen() {
     for handle in handles {
         handle.join().unwrap();
     }
-    println!("finished.");
+    info!("finished.");
     
 }
     /*
@@ -186,7 +186,7 @@ pub fn pubkey_or_sign(party: char, pub_or_sign: bool, shm: &gs) {
             .split("/")
             .collect();
         */
-        //            println!("sign me {:?} / {:?} / {:?}", manager_addr, message, params);
+        //            info!("sign me {:?} / {:?} / {:?}", manager_addr, message, params);
         let params = Params {
             threshold: String::from("2"),
             parties: String::from("3"),

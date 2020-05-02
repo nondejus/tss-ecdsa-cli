@@ -52,7 +52,7 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm
          &tn_params, shm).unwrap() {
         PartySignup { number, uuid } => (number, uuid),
     };
-    println!("number: {:?}, uuid: {:?}", party_num_int, uuid);
+    info!("number: {:?}, uuid: {:?}", party_num_int, uuid);
 
     let party_keys = Keys::create(party_num_int as usize);
     let (bc_i, decom_i) = party_keys.phase1_broadcast_phase3_proof_of_correct_key();
@@ -279,7 +279,7 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm
         y_sum,
     ))
     .unwrap();
-    println!("Keys data written to file: {:?}", keysfile_path);
+    info!("Keys data written to file: {:?}", keysfile_path);
     fs::write(&keysfile_path, keygen_json).expect("Unable to save !");
 }
 
