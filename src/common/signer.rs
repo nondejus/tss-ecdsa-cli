@@ -2,7 +2,7 @@ extern crate curv;
 extern crate hex;
 extern crate multi_party_ecdsa;
 extern crate paillier;
-extern crate reqwest;
+//extern crate reqwest;
 extern crate serde_json;
 
 use std::time;
@@ -19,7 +19,7 @@ use curv::{BigInt, FE, GE};
 use multi_party_ecdsa::protocols::multi_party_ecdsa::gg_2018::mta::*;
 use multi_party_ecdsa::protocols::multi_party_ecdsa::gg_2018::party_i::*;
 use paillier::*;
-use reqwest::blocking::Client;
+//use reqwest::blocking::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 

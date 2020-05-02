@@ -1,10 +1,9 @@
-
-extern crate clap;
+//extern crate clap;
 extern crate curv;
 extern crate hex;
 extern crate multi_party_ecdsa;
 extern crate paillier;
-extern crate reqwest;
+//extern crate reqwest;
 extern crate serde_json;
 
 pub mod common;

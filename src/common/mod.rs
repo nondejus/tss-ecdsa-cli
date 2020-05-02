@@ -20,7 +20,7 @@ use curv::{
     elliptic::curves::traits::{ECPoint, ECScalar},
     BigInt, FE, GE,
 };
-use reqwest::blocking::Client;
+//use reqwest::blocking::Client;
 use serde::{Deserialize, Serialize};
 
 pub type Key = String;
