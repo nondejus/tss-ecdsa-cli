@@ -27,8 +27,10 @@ use log::{info};
 mod common;
 use std::thread;
 use std::char;
-
 fn main() {
+    run_keygen();
+}
+pub fn run_keygen() {
     let shared_hm: Arc<Mutex<HashMap<Key, String>>> = Arc::new(Mutex::new(HashMap::new()));
     manager(&shared_hm);
     let mut handles = vec![];
