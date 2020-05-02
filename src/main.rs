@@ -25,11 +25,25 @@ use serde_json::json;
 use common::{hd_keys, keygen, manager, signer, Params};
 use log::{info};
 mod common;
-
+use std::thread;
+use std::char;
 
 fn main() {
     let shared_hm: Arc<Mutex<HashMap<Key, String>>> = Arc::new(Mutex::new(HashMap::new()));
-    println!("Doing Nothing right now");
+    manager(&shared_hm);
+    let mut handles = vec![];
+    for i in 1..4 {
+        let hm = Arc::clone(&shared_hm);
+        let handle = thread::spawn(move || {
+            keygen(char::from_digit(i, 10).unwrap(), &hm);
+        });
+        handles.push(handle);
+    }
+    for handle in handles {
+        handle.join().unwrap();
+    }
+    println!("finished.");
+    
 }
     /*
     let matches = App::new("TSS CLI Utility")

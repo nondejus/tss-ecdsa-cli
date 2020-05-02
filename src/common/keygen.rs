@@ -288,10 +288,14 @@ pub fn keygen_signup(
     //client: &Client,
     params: &Params,
     shm: &gs) -> Result<PartySignup, ()> {
-    let res_body = postb(
+    use crate::manager::signup_keygen;
+    signup_keygen(*params.clone(), shm)
+    /*let res_body = postb(
         &addr,
         //&client,
         "signupkeygen",
         params, shm).unwrap();
-    serde_json::from_str(&res_body).unwrap()
+    */
+
+    //serde_json::from_str(&res_body).unwrap()
 }

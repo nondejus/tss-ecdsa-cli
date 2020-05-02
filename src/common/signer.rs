@@ -633,9 +633,12 @@ pub fn signup(
      //client: &Client,
      params: &Params,
      shm: &gs) -> Result<PartySignup, ()> {
-    let res_body = postb(&addr,
+    use crate::manager::signup_sign;
+    signup_sign(*params.clone(), shm)
+    /*let res_body = postb(&addr,
         // &client,
          "signupsign", params, shm).unwrap();
     let answer: Result<PartySignup, ()> = serde_json::from_str(&res_body).unwrap();
     return answer;
+    */
 }

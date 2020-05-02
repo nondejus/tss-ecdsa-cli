@@ -84,8 +84,6 @@ pub fn postb<T>(
     path: &str,
     body: T,
     shm: &gs) -> Option<String>
-where
-    T: serde::ser::Serialize,
 {
     //    let mut addr = env::args()
     //        .nth(4)
@@ -102,7 +100,7 @@ where
         let addr = format!("{}/{}", addr, path);
         match path {
             "get" => {
-                return None
+                manager::get(, shm);
             },
             "set" => { return None},
             "signupkeygen" => {return None},
@@ -134,11 +132,12 @@ pub fn broadcast(
         key: key.clone(),
         value: data,
     };
-
-    let res_body = postb(&addr,
+    manager::set(entry, shm)
+    /*let res_body = postb(&addr,
         // &client,
          "set", entry, shm).unwrap();
     serde_json::from_str(&res_body).unwrap()
+    */
 }
 
 pub fn sendp2p(
@@ -157,11 +156,12 @@ pub fn sendp2p(
         key: key.clone(),
         value: data,
     };
-
-    let res_body = postb(&addr, 
+    manager::set(entry, shm)
+    /*let res_body = postb(&addr, 
         //&client,
          "set", entry, shm).unwrap();
     serde_json::from_str(&res_body).unwrap()
+    */
 }
 
 pub fn poll_for_broadcasts(
@@ -182,11 +182,13 @@ pub fn poll_for_broadcasts(
             loop {
                 // add delay to allow the server to process request:
                 thread::sleep(delay);
-                let res_body = postb(&addr,
+                /*let res_body = postb(&addr,
                     // &client,
                      "get", index.clone(), shm).unwrap();
-                let answer: Result<Entry, ()> = serde_json::from_str(&res_body).unwrap();
-                if let Ok(answer) = answer {
+                */
+                let res_body = manager::get(index, shm);
+                //let answer: Result<Entry, ()> = serde_json::from_str(&res_body).unwrap();
+                if let Ok(answer) = res_body {
                     ans_vec.push(answer.value);
                     println!("[{:?}] party {:?} => party {:?}", round, i, party_num);
                     break;
@@ -215,11 +217,12 @@ pub fn poll_for_p2p(
             loop {
                 // add delay to allow the server to process request:
                 thread::sleep(delay);
-                let res_body = postb(&addr,
+                /*let res_body = postb(&addr,
                     // &client,
                      "get", index.clone(), shm).unwrap();
-                let answer: Result<Entry, ()> = serde_json::from_str(&res_body).unwrap();
-                if let Ok(answer) = answer {
+                let answer: Result<Entry, ()> = serde_json::from_str(&res_body).unwrap();*/
+                let res_body = manager::get(index, shm);
+                if let Ok(answer) = res_body {
                     ans_vec.push(answer.value);
                     println!("[{:?}] party {:?} => party {:?}", round, i, party_num);
                     break;
