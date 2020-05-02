@@ -10,7 +10,10 @@ extern crate reqwest;
 extern crate serde_json;
 
 use std::fs;
-
+use std::sync::{Arc, Mutex};
+use crate::common::{Entry, Index, Key};
+use std::collections::HashMap;
+type gs = Arc<Mutex<HashMap<Key, String>>>;
 //use clap::{App, AppSettings, Arg, SubCommand};
 use curv::cryptographic_primitives::secret_sharing::feldman_vss::VerifiableSS;
 use curv::elliptic::curves::traits::*;
@@ -25,6 +28,7 @@ mod common;
 
 
 fn main() {
+    let shared_hm: Arc<Mutex<HashMap<Key, String>>> = Arc::new(Mutex::new(HashMap::new()));
     println!("Doing Nothing right now");
 }
     /*
@@ -93,13 +97,13 @@ fn main() {
     */
 //    match matches.subcommand() {
         //("pubkey", Some(sub_matches)) | ("sign", Some(sub_matches)) => {
-pub fn pubkey_or_sign(party: char, pub_or_sign: bool) {
-    let keysfile_path = String::from("keysfile_");
+pub fn pubkey_or_sign(party: char, pub_or_sign: bool, shm: gs) {
+    let mut keysfile_path = String::from("keysfile_");
     keysfile_path.push(party);
 
     // Read data from keys file
-    let data = fs::read_to_string(keysfile_path).expect(
-        format!("Unable to load keys file at location: {}", keysfile_path).as_str(),
+    let data = fs::read_to_string(&keysfile_path).expect(
+        format!("Unable to load keys file at location: {}", &keysfile_path).as_str(),
     );
     let (party_keys, shared_keys, party_id, mut vss_scheme_vec, paillier_key_vector, y_sum): (
         Keys,
@@ -171,6 +175,7 @@ pub fn pubkey_or_sign(party: char, pub_or_sign: bool) {
             &message,
             &f_l_new,
             false,
+            shm,
             // !path.is_empty(), 
         )
     }
@@ -189,7 +194,7 @@ pub fn keygen(party: char) {
         .to_string();
     */
 
-    let keysfile_path = String::from("keysfile_");
+    let mut keysfile_path = String::from("keysfile_");
     keysfile_path.push(party);
     //let keysfile_path = sub_matches.value_of("keysfile").unwrap_or("").to_string();
     /*let params = Params {

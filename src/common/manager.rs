@@ -5,6 +5,8 @@ use std::sync::{RwLock, Mutex, Arc};
 //use rocket_contrib::json::Json;
 use uuid::Uuid;
 
+type gs = Arc<Mutex<HashMap<Key, String>>>;
+
 use crate::common::{Entry, Index, Key, Params, PartySignup};
 use serde_json;
 
@@ -58,7 +60,8 @@ pub fn run_manager() {
 //#[post("/get", format = "json", data = "<request>")]
 pub fn get(
     //db_mtx: State<RwLock<HashMap<Key, String>>>,
-    request: Index
+    request: Index,
+    shm: gs
 //) -> Json<Result<Entry, ()>> {
 ) -> Result<Entry, ()> {
     //let index: Index = request.0;
@@ -79,7 +82,7 @@ pub fn get(
 
 //#[post("/set", format = "json", data = "<request>")]
 //fn set(db_mtx: State<RwLock<HashMap<Key, String>>>, request: Json<Entry>) -> Json<Result<(), ()>> {
-pub fn set(request: Entry) -> Result<(), ()> {
+pub fn set(request: Entry, shm: gs) -> Result<(), ()> {
 
     let hm = get_shared_state().lock().unwrap();
     //let mut hm = db_cell.borrow_mut();
@@ -91,6 +94,7 @@ pub fn set(request: Entry) -> Result<(), ()> {
 pub fn signup_keygen(
 //    db_mtx: State<RwLock<HashMap<Key, String>>>,
     request: Params,
+    shm: gs
 //) -> Json<Result<PartySignup, ()>> {
 ) -> Result<PartySignup, ()> {
     let parties = request.parties.parse::<u16>().unwrap();
@@ -126,6 +130,7 @@ pub fn signup_sign(
 //    db_mtx: State<RwLock<HashMap<Key, String>>>,
 //    request: Json<Params>,
     request: Params,
+    shm: gs
 //) -> Json<Result<PartySignup, ()>> {
 ) -> Result<PartySignup, ()> {
     let threshold = request.threshold.parse::<u16>().unwrap();

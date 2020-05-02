@@ -3,6 +3,11 @@ pub mod keygen;
 pub mod manager;
 pub mod signer;
 
+use std::sync::{Arc, Mutex};
+use crate::common::{Entry, Index, Key};
+use std::collections::HashMap;
+type gs = Arc<Mutex<HashMap<Key, String>>>;
+
 use std::{iter::repeat, thread, time, time::Duration};
 use log::info;
 use crypto::{

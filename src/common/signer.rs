@@ -6,6 +6,10 @@ extern crate reqwest;
 extern crate serde_json;
 
 use std::time;
+use std::sync::{Arc, Mutex};
+use crate::common::{Entry, Index, Key};
+use std::collections::HashMap;
+type gs = Arc<Mutex<HashMap<Key, String>>>;
 
 use curv::cryptographic_primitives::proofs::sigma_correct_homomorphic_elgamal_enc::HomoELGamalProof;
 use curv::cryptographic_primitives::proofs::sigma_dlog::DLogProof;
@@ -41,6 +45,7 @@ pub fn sign(
     message: &[u8],
     f_l_new: &FE,
     sign_at_path: bool,
+    shm: gs
 ) {
     //let client = Client::new();
     let delay = time::Duration::from_millis(25);
