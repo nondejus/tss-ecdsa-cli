@@ -8,12 +8,13 @@ extern crate serde_json;
 
 pub mod common;
 pub mod random_state;
+pub mod error;
 
 use std::fs;
 use std::sync::{Arc, Mutex};
 use crate::common::{Entry, Index, Key};
 use std::collections::{HashMap};
-type gs = Arc<Mutex<HashMap<Key, String, random_state::PsRandomState>>>;
+type gs = HashMap<Key, String, random_state::PsRandomState>;
 //use clap::{App, AppSettings, Arg, SubCommand};
 use curv::cryptographic_primitives::secret_sharing::feldman_vss::VerifiableSS;
 use curv::elliptic::curves::traits::*;
@@ -30,31 +31,12 @@ use random_state::PsRandomState;
 
 pub fn run_keygen() {
     //let shared_hm: Arc<Mutex<HashMap<Key, String>>> = Arc::new(Mutex::new(HashMap::new()));
-    let shared_hm: Arc<Mutex<HashMap<Key, String, PsRandomState>>> = Arc::new(Mutex::new(HashMap::with_hasher(PsRandomState::new())));
-    manager(&shared_hm);
-    let mut handles = vec![];
-    for i in 1..4 {
-        let hm = Arc::clone(&shared_hm);
-        let handle = thread::spawn(move || {
-            keygen(char::from_digit(i, 10).unwrap(), &hm);
-        });
-        handles.push(handle);
-    }
-    for handle in handles {
-        handle.join().unwrap();
-    }
-    handles = vec![];
-    for i in 1..4 {
-        let hm = Arc::clone(&shared_hm);
-        let handle = thread::spawn(move || {
-            pubkey_or_sign(char::from_digit(i, 10).unwrap(), false, &hm);
-        });
-        handles.push(handle);
-    }
+    let mut shared_hm: HashMap<Key, String, PsRandomState> = HashMap::with_hasher(PsRandomState::new());
+    manager(&mut shared_hm);
 
-    for handle in handles {
-        handle.join().unwrap();
-    }
+    
+    keygen(char::from_digit(1, 10).unwrap(), &mut shared_hm);
+   // pubkey_or_sign(char::from_digit(i, 10).unwrap(), false, &hm);
     info!("finished.");
     
 }
@@ -124,7 +106,7 @@ pub fn run_keygen() {
     */
 //    match matches.subcommand() {
         //("pubkey", Some(sub_matches)) | ("sign", Some(sub_matches)) => {
-pub fn pubkey_or_sign(party: char, pub_or_sign: bool, shm: &gs) {
+pub fn pubkey_or_sign(party: char, pub_or_sign: bool, shm: &mut gs) {
     let mut keysfile_path = String::from("keysfile_");
     keysfile_path.push(party);
 
@@ -208,11 +190,11 @@ pub fn pubkey_or_sign(party: char, pub_or_sign: bool, shm: &gs) {
     }
 }
 
-pub fn manager(shm: &gs) {
+pub fn manager(shm: &mut gs) {
 //("manager", Some(_matches)) => manager::run_manager(),
     manager::run_manager(shm);
 }
-pub fn keygen(party: char, shm: &gs) {
+pub fn keygen(party: char, shm: &mut gs) {
 //("keygen", Some(sub_matches)) => {
     let addr = String::from("dummy");
     /*    let addr = sub_matches
@@ -221,8 +203,8 @@ pub fn keygen(party: char, shm: &gs) {
         .to_string();
     */
 
-    let mut keysfile_path = String::from("keysfile_");
-    keysfile_path.push(party);
+    //let mut keysfile_path = String::from("keysfile_");
+    //keysfile_path.push(party);
     //let keysfile_path = sub_matches.value_of("keysfile").unwrap_or("").to_string();
     /*let params = Params {
         threshold: String::from("2"),
@@ -238,7 +220,7 @@ pub fn keygen(party: char, shm: &gs) {
     */
     keygen::run_keygen(
         &addr,
-        &keysfile_path,
+        &String::from("dummy_keys_file"),
         &params,
         shm
     );

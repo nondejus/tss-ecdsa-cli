@@ -9,7 +9,7 @@ use std::time;
 use std::sync::{Arc, Mutex};
 use crate::common::{Entry, Index, Key};
 use std::collections::HashMap;
-type gs = Arc<Mutex<HashMap<Key, String, crate::random_state::PsRandomState>>>;
+type gs = HashMap<Key, String, crate::random_state::PsRandomState>;
 
 use curv::cryptographic_primitives::proofs::sigma_correct_homomorphic_elgamal_enc::HomoELGamalProof;
 use curv::cryptographic_primitives::proofs::sigma_dlog::DLogProof;
@@ -46,7 +46,7 @@ pub fn sign(
     message: &[u8],
     f_l_new: &FE,
     sign_at_path: bool,
-    shm: &gs
+    shm: &mut gs
 ) {
     //let client = Client::new();
     let delay = time::Duration::from_millis(25);
@@ -633,7 +633,7 @@ pub fn signup(
      addr: &String,
      //client: &Client,
      params: &Params,
-     shm: &gs) -> Result<PartySignup, ()> {
+     shm: &mut gs) -> Result<PartySignup, ()> {
     use crate::manager::signup_sign;
     signup_sign((*params).clone(), shm)
     /*let res_body = postb(&addr,

@@ -6,7 +6,7 @@ pub mod signer;
 use std::sync::{Arc, Mutex};
 
 use std::collections::HashMap;
-type gs = Arc<Mutex<HashMap<Key, String, crate::random_state::PsRandomState>>>;
+type gs = HashMap<Key, String, crate::random_state::PsRandomState>;
 
 use std::{iter::repeat, thread, time, time::Duration};
 use log::info;
@@ -125,7 +125,7 @@ pub fn broadcast(
     round: &str,
     data: String,
     sender_uuid: String,
-    shm: &gs
+    shm: &mut gs
 ) -> Result<(), ()> {
     let key = format!("{}-{}-{}", party_num, round, sender_uuid);
     let entry = Entry {
@@ -148,7 +148,7 @@ pub fn sendp2p(
     round: &str,
     data: String,
     sender_uuid: String,
-    shm: &gs
+    shm: &mut gs
 ) -> Result<(), ()> {
     let key = format!("{}-{}-{}-{}", party_from, party_to, round, sender_uuid);
 
@@ -172,7 +172,7 @@ pub fn poll_for_broadcasts(
     delay: Duration,
     round: &str,
     sender_uuid: String,
-    shm: &gs
+    shm: &mut gs
 ) -> Vec<String> {
     let mut ans_vec = Vec::new();
     for i in 1..=n {
@@ -207,7 +207,7 @@ pub fn poll_for_p2p(
     delay: Duration,
     round: &str,
     sender_uuid: String,
-    shm: &gs
+    shm: &mut gs
 ) -> Vec<String> {
     let mut ans_vec = Vec::new();
     for i in 1..=n {
