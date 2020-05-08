@@ -386,8 +386,12 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm
         ))
         .unwrap();
         */
-        info!("Keys data written to file: {:?}", keysfile_path_i[*n - 1]);
-        fs::write(&keysfile_path_i[*n -1], keygen_final_json).expect("Unable to save !");
+        if cfg!(any(target_arch = "x86", target_arch = "x86_64")){
+            info!("Keys data written to file: {:?}", keysfile_path_i[*n - 1]);
+            fs::write(&keysfile_path_i[*n -1], keygen_final_json).expect("Unable to save !");
+        } else{
+            info!("final key gen json for party {}{}", *n, keygen_final_json);
+        }
     }
 }
 
