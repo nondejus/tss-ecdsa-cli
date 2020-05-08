@@ -19,7 +19,7 @@ use curv::{
     BigInt, FE, GE,
 };
 use multi_party_ecdsa::protocols::multi_party_ecdsa::gg_2018::party_i::{
-    KeyGenBroadcastMessage1, KeyGenDecommitMessage1, Keys, Parameters,
+    KeyGenBroadcastMessage1, KeyGenDecommitMessage1, Keys, Parameters, SharedKeys
 };
 use paillier::EncryptionKey;
 //use reqwest::blocking::Client;
@@ -366,7 +366,16 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm
         let paillier_key_vec = (0..PARTIES)
             .map(|i| bc_vec_i[*n-1][i as usize].e.clone())
             .collect::<Vec<EncryptionKey>>();
-      
+        let keygen_final_result = KeyGenResult {
+            party_keys: party_keys[*n-1].clone(),
+            shared_keys: shared_keys_i[*n-1].clone(),
+            party_number: *n as u16,
+            vss_scheme_vec_i: vss_scheme_vec_i[*n-1].clone(),
+            paillier_key_vector: paillier_key_vec,
+            y_sum: y_sum_i[*n - 1], 
+        };
+        let keygen_final_json = serde_json::to_string(&keygen_final_result).unwrap();
+        /*
         let keygen_json = serde_json::to_string(&(
             party_keys[*n-1].clone(),
             shared_keys_i[*n-1].clone(),
@@ -376,21 +385,22 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm
             y_sum_i[*n - 1].clone(),
         ))
         .unwrap();
+        */
         info!("Keys data written to file: {:?}", keysfile_path_i[*n - 1]);
-        fs::write(&keysfile_path_i[*n -1], keygen_json).expect("Unable to save !");
+        fs::write(&keysfile_path_i[*n -1], keygen_final_json).expect("Unable to save !");
     }
 }
 
-/*#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize)]
 struct KeyGenResult {
     party_keys: Keys,
-    shared_keys:,
+    shared_keys: SharedKeys,
     party_number: u16,
-    vss_scheme_vec_i:,
-    paillier_key_vec:,
-    y_sum:, 
+    vss_scheme_vec_i: Vec<VerifiableSS>,
+    paillier_key_vector: Vec<EncryptionKey>,
+    y_sum: GE, 
 }
-*/
+
 pub fn keygen_signup(
     addr: &String,
     //client: &Client,
