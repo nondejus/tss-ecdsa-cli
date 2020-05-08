@@ -68,7 +68,7 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm
 
     //signup:
     let part_num_int: [usize; 3] = [1, 2, 3];
-    let mut uuids_i: Vec<String> = Vec::new();
+    let mut uuids_i = vec![];
     let tn_params = Params {
         threshold: THRESHOLD.to_string(),
         parties: PARTIES.to_string(),

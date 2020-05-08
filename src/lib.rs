@@ -40,72 +40,6 @@ pub fn run_keygen() {
     info!("finished.");
     
 }
-    /*
-    let matches = App::new("TSS CLI Utility")
-        .version("0.1.0")
-        .author("Kaspars Sprogis <darklow@gmail.com>")
-//        .about("")
-        .setting(AppSettings::SubcommandRequiredElseHelp)
-        .subcommands(vec![
-            SubCommand::with_name("manager").about("Run state manager"),
-            SubCommand::with_name("keygen").about("Run keygen")
-                .arg(Arg::with_name("keysfile")
-                    .required(true)
-                    .index(1)
-                    .takes_value(true)
-                    .help("Target keys file"))
-                .arg(Arg::with_name("params")
-                    .index(2)
-                    .required(true)
-                    .takes_value(true)
-                    .help("Threshold params: threshold/parties (t+1/n). E.g. 1/3 for 2 of 3 schema."))
-                .arg(Arg::with_name("manager_addr")
-                    .short("a")
-                    .long("addr")
-                    .takes_value(true)
-                    .help("URL to manager. E.g. http://127.0.0.2:8002")),
-            SubCommand::with_name("pubkey").about("Get X,Y of a pub key")
-                .arg(Arg::with_name("keysfile")
-                    .required(true)
-                    .index(1)
-                    .takes_value(true)
-                    .help("Keys file"))
-                .arg(Arg::with_name("path")
-                    .short("p")
-                    .long("path")
-                    .takes_value(true)
-                    .help("Derivation path (Optional)")),
-            SubCommand::with_name("sign").about("Run signer")
-                .arg(Arg::with_name("keysfile")
-                    .required(true)
-                    .index(1)
-                    .takes_value(true)
-                    .help("Keys file"))
-                .arg(Arg::with_name("params")
-                    .index(2)
-                    .required(true)
-                    .takes_value(true)
-                    .help("Threshold params: threshold/parties (t+1/n). E.g. 1/3 for 2 of 3 schema."))
-                .arg(Arg::with_name("message")
-                    .index(3)
-                    .required(true)
-                    .takes_value(true)
-                    .help("Message to sign in hex format"))
-                .arg(Arg::with_name("path")
-                    .short("p")
-                    .long("path")
-                    .takes_value(true)
-                    .help("Derivation path"))
-                .arg(Arg::with_name("manager_addr")
-                    .short("a")
-                    .long("addr")
-                    .takes_value(true)
-                    .help("URL to manager"))
-        ])
-        .get_matches();
-    */
-//    match matches.subcommand() {
-        //("pubkey", Some(sub_matches)) | ("sign", Some(sub_matches)) => {
 pub fn pubkey_or_sign(party: char, pub_or_sign: bool, shm: &mut gs) {
     let mut keysfile_path = String::from("keysfile_");
     keysfile_path.push(party);
@@ -206,10 +140,7 @@ pub fn keygen(party: char, shm: &mut gs) {
     //let mut keysfile_path = String::from("keysfile_");
     //keysfile_path.push(party);
     //let keysfile_path = sub_matches.value_of("keysfile").unwrap_or("").to_string();
-    /*let params = Params {
-        threshold: String::from("2"),
-        parties: String::from("3"),
-    };*/
+
     let params = vec!["2", "3"];
     /*
     let params: Vec<&str> = sub_matches
