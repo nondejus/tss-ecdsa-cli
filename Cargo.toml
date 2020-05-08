@@ -43,6 +43,7 @@ env_logger = "0.7"
 [patch.crates-io]
 rust-gmp = { version = "0.5.0", features = ["serde_support"], git = "https://github.com/PolySignInc/rust-gmp" }
 uuid = { version = "0.8", git = "https://github.com/PolySignInc/uuid", branch = "0.8.1t", features = ["v4"] }
+rand = { git = "https://github.com/PolySignInc/rand.git" , branch = "0.6.5t" }
 
 [profile.release]
 opt-level = 2
