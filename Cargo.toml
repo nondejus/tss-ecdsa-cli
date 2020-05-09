@@ -19,7 +19,7 @@ serde_derive = "1.0"
 hex = "0.4"
 #reqwest = { version = "0.10.1", default-features = false, features = ["native-tls", "json", "blocking"] }
 uuid = { git = "https://github.com/PolySignInc/uuid", branch = "0.8.1t", features = ["v4"] }
-rust-crypto = "0.2"
+rust-crypto = { git = "https://github.com/PolySignInc/rust-crypto", branch = "v0.2.36t" }
 libsecp256k1 = "0.3.2"
 paillier = { git = "https://github.com/PolySignInc/rust-paillier", branch = "v0.3.4t"}
 zk-paillier = { git = "https://github.com/PolySignInc/zk-paillier", branch = "v0.2.5t"}
