@@ -151,6 +151,7 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm
         );
         round2_ans_vec_i.push(round2_ans_vec);
     }
+    info!("after working");
     let mut point_vec_i = vec![];
     let mut decom_vec_i = vec![];
     let mut enc_keys_i = vec![];
@@ -158,11 +159,14 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm
     let mut secret_shares_i = vec![];
     let mut y_sum_i = vec![];
     for n in part_num_int.iter(){
+        info!("iteration {}", *n);
         let mut j = 0;
         let mut point_vec: Vec<GE> = Vec::new();
         let mut decom_vec: Vec<KeyGenDecommitMessage1> = Vec::new();
         let mut enc_keys: Vec<BigInt> = Vec::new();
         for i in 1..=PARTIES {
+
+            info!("iteration {}", i);
             if i == *n as u16 {
                 let decom_i = b_d_i[*n - 1].1.clone();
                 point_vec.push(decom_i.y_i);
@@ -179,6 +183,8 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm
         let (head, tail) = point_vec.split_at(1);
         let y_sum = tail.iter().fold(head[0], |acc, x| acc + x);
         y_sum_i.push(y_sum);
+
+        info!("iteration {}", *n);
         let (vss_scheme, secret_shares, _index) = party_keys[*n - 1]
             .phase1_verify_com_phase3_verify_correct_key_phase2_distribute(
                 &params, &decom_vec, &(bc_vec_i[*n-1]),
@@ -190,6 +196,8 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm
         let mut j = 0;
         for (k, i) in (1..=PARTIES).enumerate() {
             if i != *n as u16 {
+
+                info!("iteration {}", i);
                 // prepare encrypted ss for party i:
                 let key_i = BigInt::to_vec(&enc_keys[j]);
                 let plaintext = BigInt::to_vec(&secret_shares[k].to_big_int());
@@ -218,6 +226,7 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm
 /////////////////////////////////////////////////////////////////////////
     let mut round3_ans_vec_i = vec![];
     for n in part_num_int.iter(){
+        info!("iteration {}", *n);
         let round3_ans_vec = poll_for_p2p(
             &addr,
             //&client,
@@ -234,9 +243,13 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm
     let mut party_shares_i = vec![];
 
     for n in part_num_int.iter(){
+
+        info!("iteration {}", *n);
         let mut j = 0;
         let mut party_shares: Vec<FE> = Vec::new();
         for i in 1..=PARTIES {
+
+            info!("iteration {}", i);
             if i == *n as u16 {
                 party_shares.push(secret_shares_i[*n - 1][(i - 1) as usize]);
             } else {
@@ -252,6 +265,8 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm
         }
         party_shares_i.push(party_shares);
         // round 4: send vss commitments
+
+        info!("iteration {}", *n);
         assert!(broadcast(
             &addr,
             //&client,
@@ -269,6 +284,8 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm
     let mut round4_ans_vec_i = vec![];
     let mut vss_scheme_vec_i = vec![];
     for n in part_num_int.iter(){
+
+        info!("iteration {}", *n);
         let round4_ans_vec = poll_for_broadcasts(
             &addr,
             //&client,
@@ -289,6 +306,8 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm
     let mut shared_keys_i = vec![];
     let mut dlog_proof_i = vec![];
     for n in part_num_int.iter(){
+
+        info!("iteration {}", *n);
         let mut j = 0;
         let mut vss_scheme_vec: Vec<VerifiableSS> = Vec::new();
         for i in 1..=PARTIES {
@@ -301,6 +320,7 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm
             }
         }
 
+        info!("iteration {}", *n);
         let (shared_keys, dlog_proof) = party_keys[*n -1]
             .phase2_verify_vss_construct_keypair_phase3_pok_dlog(
                 &params,
@@ -310,7 +330,8 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm
                 *n as usize,
             )
             .expect("invalid vss");
-
+        
+        info!("iteration {}", *n);
         // round 5: send dlog proof
         assert!(broadcast(
             &addr,
@@ -349,6 +370,8 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm
     /// 
     /// 
     for n in part_num_int.iter(){
+
+        info!("iteration {}", *n);
         let mut j = 0;
         let mut dlog_proof_vec: Vec<DLogProof> = Vec::new();
         for i in 1..=PARTIES {
@@ -360,8 +383,11 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm
                 j += 1;
             }
         }
+
+        info!("iteration {}", *n);
         Keys::verify_dlog_proofs(&params, &dlog_proof_vec, &point_vec_i[*n -1]).expect("bad dlog proof");
 
+        info!("iteration {}", *n);
         //save key to file:
         let paillier_key_vec = (0..PARTIES)
             .map(|i| bc_vec_i[*n-1][i as usize].e.clone())
