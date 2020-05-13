@@ -91,14 +91,15 @@ pub fn sign(
             THRESHOLD + 1,
             delay,
             "round0",
-            uuid_i[*n].clone(),
+            uuid_i[*n-1].clone(),
             shm,
         );
         round0_ans_vec_i.push(round0_ans_vec);
     }   
-
-    let mut signers_vec: Vec<usize> = Vec::new();
+    let mut signers_vec_i = vec![];
     for n in party_num_int_i.iter(){
+
+        let mut signers_vec: Vec<usize> = Vec::new();
         let mut j = 0;
         for i in 1..=THRESHOLD + 1 {
             if i == *n as u16 {
@@ -109,6 +110,7 @@ pub fn sign(
                 j = j + 1;
             }
         }
+        signers_vec_i.push(signers_vec);
     }   
     /*
     if sign_at_path == true {
@@ -163,9 +165,9 @@ pub fn sign(
 
         let sign_keys = SignKeys::create(
             &private,
-            &keygen_result[*n -1].vss_scheme_vec_i[signers_vec[(*n - 1) as usize]],
-            signers_vec[(*n - 1) as usize],
-            &signers_vec,
+            &keygen_result[*n -1].vss_scheme_vec_i[signers_vec_i[*n-1][(*n - 1) as usize]],
+            signers_vec_i[*n-1][(*n - 1) as usize],
+            &signers_vec_i[*n-1],
         );
 
         //////////////////////////////////////////////////////////////////////////////
@@ -203,7 +205,7 @@ pub fn sign(
     }
 
     let mut bc1_vec_i = vec![];
-    let mut m_a_vec_i = vec![];
+    //let mut m_a_vec_i = vec![];
     let mut beta_vec_i = vec![];
     let mut ni_vec_i = vec![];
     for n in party_num_int_i.iter() {
@@ -226,7 +228,7 @@ pub fn sign(
                 //       }
             }
         }
-        assert_eq!(signers_vec.len(), bc1_vec.len());
+        assert_eq!(signers_vec_i[*n-1].len(), bc1_vec.len());
     
         bc1_vec_i.push(bc1_vec);
 
@@ -240,12 +242,12 @@ pub fn sign(
             if i != *n as u16 {
                 let (m_b_gamma, beta_gamma) = MessageB::b(
                     &sign_keys_i[*n - 1].gamma_i,
-                    &keygen_result[*n - 1].paillier_key_vector[signers_vec[(i - 1) as usize]],
+                    &keygen_result[*n - 1].paillier_key_vector[signers_vec_i[*n-1][(i - 1) as usize]],
                     m_a_vec[j].clone(),
                 );
                 let (m_b_w, beta_wi) = MessageB::b(
                     &sign_keys_i[*n-1].w_i,
-                    &keygen_result[*n-1].paillier_key_vector[signers_vec[(i - 1) as usize]],
+                    &keygen_result[*n-1].paillier_key_vector[signers_vec_i[*n-1][(i - 1) as usize]],
                     m_a_vec[j].clone(),
                 );
                 m_b_gamma_send_vec.push(m_b_gamma);
@@ -335,10 +337,10 @@ pub fn sign(
                 alpha_vec.push(alpha_ij_gamma);
                 miu_vec.push(alpha_ij_wi);
                 let g_w_i = Keys::update_commitments_to_xi(
-                    &xi_com_vec[signers_vec[(i - 1) as usize]],
-                    &keygen_result[*n-1].vss_scheme_vec_i[signers_vec[(i - 1) as usize]],
-                    signers_vec[(i - 1) as usize],
-                    &signers_vec,
+                    &xi_com_vec[signers_vec_i[*n-1][(i - 1) as usize]],
+                    &keygen_result[*n-1].vss_scheme_vec_i[signers_vec_i[*n-1][(i - 1) as usize]],
+                    signers_vec_i[*n-1][(i - 1) as usize],
+                    &signers_vec_i[*n-1],
                 );
                 //info!("Verifying client {}", party_num_int);
                 assert_eq!(m_b.b_proof.pk.clone(), g_w_i);
@@ -426,7 +428,7 @@ pub fn sign(
     let mut phase5_com_i = vec![];
     let mut phase_5a_decom_i = vec![];
     let mut helgamal_proof_i = vec![];
-    let local_sig_i = vec![];
+    let mut local_sig_i = vec![];
     let mut R_i = vec![];
     for n in party_num_int_i.iter() {
         let mut decommit_vec: Vec<SignDecommitPhase1> = Vec::new();
@@ -497,7 +499,7 @@ pub fn sign(
         format_vec_from_reads(
             &round5_ans_vec_i[*n-1],
             *n as usize,
-            phase5_com_i[*n-1],
+            phase5_com_i[*n-1].clone(),
             &mut commit5a_vec,
         );
 
@@ -528,7 +530,7 @@ pub fn sign(
             uuid_i[*n-1].clone(),
             shm
         );
-        round0_ans_vec_i.push(round6_ans_vec);
+        round6_ans_vec_i.push(round6_ans_vec);
     }
 
     let mut phase5_com2_i = vec![];
@@ -597,7 +599,7 @@ pub fn sign(
         format_vec_from_reads(
             &round7_ans_vec_i[*n-1],
             *n as usize,
-            phase5_com2_i[*n-1],
+            phase5_com2_i[*n-1].clone(),
             &mut commit5c_vec,
         );
 
@@ -672,7 +674,7 @@ pub fn sign(
             THRESHOLD + 1,
             delay.clone(),
             "round9",
-            uuid_i[*n-1],
+            uuid_i[*n-1].clone(),
             shm
         );
         round9_ans_vec_i.push(round9_ans_vec);
