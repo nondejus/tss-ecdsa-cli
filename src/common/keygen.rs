@@ -54,7 +54,7 @@ pub fn key_round1(input_json: String) -> Result<String, MyError> {
 }
 
 use crate::random_state::PsRandomState;
-pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm: &mut gs) {
+pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm: &mut gs) -> Vec<KeyGenResult>{
     let THRESHOLD: u16 = params[0].parse::<u16>().unwrap();
     let PARTIES: u16 = params[1].parse::<u16>().unwrap();
     //let client = Client::new();
@@ -369,6 +369,7 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm
     //////////////////////////////////////////////////////////////////////////////
     /// 
     /// 
+    let mut final_keys_list = vec![];
     for n in part_num_int.iter(){
 
         info!("iteration {}", *n);
@@ -413,22 +414,26 @@ pub fn run_keygen(addr: &String, keysfile_path: &String, params: &Vec<&str>, shm
         .unwrap();
         */
         if cfg!(any(target_arch = "x86", target_arch = "x86_64")){
+            final_keys_list.push(keygen_final_result);
             info!("Keys data written to file: {:?}", keysfile_path_i[*n - 1]);
             fs::write(&keysfile_path_i[*n -1], keygen_final_json).expect("Unable to save !");
+            
         } else{
             info!("final key gen json for party {}{}", *n, keygen_final_json);
+            final_keys_list.push(keygen_final_result);
         }
     }
+    final_keys_list
 }
 
 #[derive(serde::Serialize, serde::Deserialize)]
-struct KeyGenResult {
-    party_keys: Keys,
-    shared_keys: SharedKeys,
-    party_number: u16,
-    vss_scheme_vec_i: Vec<VerifiableSS>,
-    paillier_key_vector: Vec<EncryptionKey>,
-    y_sum: GE, 
+pub struct KeyGenResult {
+    pub party_keys: Keys,
+    pub shared_keys: SharedKeys,
+    pub party_number: u16,
+    pub vss_scheme_vec_i: Vec<VerifiableSS>,
+    pub paillier_key_vector: Vec<EncryptionKey>,
+    pub y_sum: GE, 
 }
 
 pub fn keygen_signup(

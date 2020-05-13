@@ -28,39 +28,40 @@ use log::{info};
 use std::thread;
 use std::char;
 use random_state::PsRandomState;
-
+use crate::common::keygen::KeyGenResult;
 pub fn run_keygen() {
     //let shared_hm: Arc<Mutex<HashMap<Key, String>>> = Arc::new(Mutex::new(HashMap::new()));
     let mut shared_hm: HashMap<Key, String, PsRandomState> = HashMap::with_hasher(PsRandomState::new());
     manager(&mut shared_hm);
 
     
-    keygen(char::from_digit(1, 10).unwrap(), &mut shared_hm);
-   // pubkey_or_sign(char::from_digit(i, 10).unwrap(), false, &hm);
+    let keygen_result = keygen(char::from_digit(1, 10).unwrap(), &mut shared_hm);
+    pubkey_or_sign(false, keygen_result, &mut shared_hm);
     info!("finished.");
     
 }
-pub fn pubkey_or_sign(party: char, pub_or_sign: bool, shm: &mut gs) {
-    let mut keysfile_path = String::from("keysfile_");
-    keysfile_path.push(party);
+pub fn pubkey_or_sign(pub_or_sign: bool, keygen_result: Vec<KeyGenResult>, shm: &mut gs) {
+    //let mut keysfile_path = String::from("keysfile_");
+    //keysfile_path.push(party);
 
     // Read data from keys file
-    let data = fs::read_to_string(&keysfile_path).expect(
-        format!("Unable to load keys file at location: {}", &keysfile_path).as_str(),
-    );
-    let (party_keys, shared_keys, party_id, mut vss_scheme_vec, paillier_key_vector, y_sum): (
-        Keys,
-        SharedKeys,
-        u16,
-        Vec<VerifiableSS>,
-        Vec<EncryptionKey>,
-        GE,
-    ) = serde_json::from_str(&data).unwrap();
+    //let data = fs::read_to_string(&keysfile_path).expect(
+    //    format!("Unable to load keys file at location: {}", &keysfile_path).as_str(),
+    //);
+        /*let (party_keys, shared_keys, party_id, mut vss_scheme_vec, paillier_key_vector, y_sum): (
+            Keys,
+            SharedKeys,
+            u16,
+            Vec<VerifiableSS>,
+            Vec<EncryptionKey>,
+            GE,
+        ) = serde_json::from_str(&data).unwrap();
+        */
 
-    // Get root pub key or HD pub key at specified path
-    //let path = sub_matches.value_of("path").unwrap_or("");
+        // Get root pub key or HD pub key at specified path
+        //let path = sub_matches.value_of("path").unwrap_or("");
     let path = "";
-    let (f_l_new, y_sum) = match path.is_empty() {
+    /*let (f_l_new, y_sum) = match path.is_empty() {
         true => (ECScalar::zero(), y_sum),
         false => {
             let path_vector: Vec<BigInt> = path
@@ -70,16 +71,18 @@ pub fn pubkey_or_sign(party: char, pub_or_sign: bool, shm: &mut gs) {
             let (y_sum_child, f_l_new) = hd_keys::get_hd_key(&y_sum, path_vector.clone());
             (f_l_new, y_sum_child.clone())
         }
-    };
-
+    };*/
     // Return pub key as x,y
     if pub_or_sign {
-        let ret_dict = json!({
-            "x": &y_sum.x_coor(),
-            "y": &y_sum.y_coor(),
-            "path": path,
-        });
-        info!("{}", ret_dict.to_string());
+
+        for n in 0..3 {
+            let ret_dict = json!({
+                "x": &keygen_result[n].y_sum.x_coor(),
+                "y": &keygen_result[n].y_sum.y_coor(),
+                "path": path,
+            });
+            info!("{}", ret_dict.to_string());
+        }
     } else {
         // Parse message to sign
         let message_str = "PolySign";
@@ -88,7 +91,7 @@ pub fn pubkey_or_sign(party: char, pub_or_sign: bool, shm: &mut gs) {
             Err(_e) => message_str.as_bytes().to_vec(),
         };
         let message = &message[..];
-        let manager_addr = party.to_string();
+        //let manager_addr = party.to_string();
         /*let manager_addr = sub_matches
             .value_of("manager_addr")
             .unwrap_or("http://127.0.0.1:8001")
@@ -107,28 +110,23 @@ pub fn pubkey_or_sign(party: char, pub_or_sign: bool, shm: &mut gs) {
             parties: String::from("3"),
         };
         signer::sign(
-            manager_addr,
-            party_keys,
-            shared_keys,
-            party_id,
-            &mut vss_scheme_vec,
-            paillier_key_vector,
-            &y_sum,
+            keygen_result, 
             &params,
             &message,
-            &f_l_new,
+            &ECScalar::zero(),
             false,
             shm,
             // !path.is_empty(), 
-        )
+        );
     }
+    
 }
 
 pub fn manager(shm: &mut gs) {
 //("manager", Some(_matches)) => manager::run_manager(),
     manager::run_manager(shm);
 }
-pub fn keygen(party: char, shm: &mut gs) {
+pub fn keygen(party: char, shm: &mut gs) -> Vec<KeyGenResult> {
 //("keygen", Some(sub_matches)) => {
     let addr = String::from("dummy");
     /*    let addr = sub_matches
@@ -154,5 +152,5 @@ pub fn keygen(party: char, shm: &mut gs) {
         &String::from("dummy_keys_file"),
         &params,
         shm
-    );
+    )
 }
