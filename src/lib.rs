@@ -85,7 +85,8 @@ pub fn pubkey_or_sign(pub_or_sign: bool, keygen_result: Vec<KeyGenResult>, shm: 
         }
     } else {
         // Parse message to sign
-        let message_str = "PolySign";
+        //let message_str = "PolySign";
+        let message_str = "b2d1e4707dab6c6f6e2f6fd9182822519dd2f5cee6ed2a4c7b29f8945f1a01bb";
         let message = match hex::decode(message_str) {
             Ok(x) => x,
             Err(_e) => message_str.as_bytes().to_vec(),
